@@ -44,7 +44,31 @@ resource "aws_iam_policy_attachment" "ecs_execution_role_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
+# Custom Policy for CloudWatch Logs
+resource "aws_iam_policy" "ecs_logging_policy" {
+  name        = "ECSLoggingPolicy"
+  description = "Allows ECS Tasks to log to CloudWatch"
 
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = "arn:aws:logs:*:*:*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_execution_role_logging" {
+  role       = aws_iam_role.ecs_execution_role.name
+  policy_arn = aws_iam_policy.ecs_logging_policy.arn
+}
 
 # ECS Cluster
 resource "aws_ecs_cluster" "log_cluster" {
