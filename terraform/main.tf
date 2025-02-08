@@ -1,5 +1,10 @@
-provider "aws" {
-  region = "us-east-1"
+terraform {
+  backend "s3" {
+    bucket         = "log-api-statefile"  # Replace with your actual S3 bucket name
+    key            = "terraform.tfstate"
+    region         = "us-east-1"
+    encrypt        = true
+  }
 }
 
 # Use the default VPC
@@ -76,6 +81,17 @@ resource "aws_ecs_task_definition" "log_task" {
         { name = "DB_PORT", value = var.db_port },
         { name = "PORT", value = var.port }
       ]
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = "/ecs/log-api"  # Log Group Name
+          awslogs-region        = var.aws_region
+          awslogs-stream-prefix = "ecs"
+          awslogs-create-group  = "true"
+          mode                  = "non-blocking"
+          max-buffer-size       = "25m"
+        }
+      }
     }
   ])
 }
