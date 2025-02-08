@@ -81,5 +81,5 @@ jobs:
       - name: Deploy Infrastructure Using Terraform
         run: |
           cd terraform 
-          terraform init
+          terraform init -reconfigure
           terraform apply -auto-approve
