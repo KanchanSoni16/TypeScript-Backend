@@ -1,0 +1,117 @@
+provider "aws" {
+  region = "us-east-1"
+}
+
+# Use the default VPC
+data "aws_vpc" "default" {
+  default = true
+}
+
+# Get available public subnets in the default VPC
+data "aws_subnets" "default_public_subnets" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.default.id]
+  }
+}
+
+
+resource "aws_iam_role" "ecs_execution_role" {
+  name = "ecsTaskExecutionRole"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "ecs-tasks.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy_attachment" "ecs_execution_role_policy" {
+  name       = "ecs-execution-role-attach"
+  roles      = [aws_iam_role.ecs_execution_role.name]
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
+
+
+
+# ECS Cluster
+resource "aws_ecs_cluster" "log_cluster" {
+  name = "log-api-cluster"
+}
+
+
+resource "aws_ecs_task_definition" "log_task" {
+  family                   = "log-api-task"
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = "256"
+  memory                   = "512"
+  execution_role_arn       = aws_iam_role.ecs_execution_role.arn
+  container_definitions = jsonencode([
+    {
+      name      = "log-api"
+      image     = "${var.aws_account_id}.dkr.ecr.${var.aws_region}.amazonaws.com/log-api:latest"
+      cpu       = 256
+      memory    = 512
+      essential = true
+
+      portMappings = [
+        {
+          containerPort = 3000
+          hostPort      = 3000
+        }
+      ]
+      environment = [
+        { name = "DB_HOST", value = var.db_host },
+        { name = "DB_USER", value = var.db_user },
+        { name = "DB_PASS", value = var.db_password },
+        { name = "DB_NAME", value = var.db_name },
+        { name = "DB_PORT", value = var.db_port },
+        { name = "PORT", value = var.port }
+      ]
+    }
+  ])
+}
+
+# ECS Service
+resource "aws_ecs_service" "log_service" {
+  name            = "log-api-service"
+  cluster         = aws_ecs_cluster.log_cluster.id
+  task_definition = aws_ecs_task_definition.log_task.arn
+  launch_type     = "FARGATE"
+  desired_count   = 1
+
+  network_configuration {
+    subnets          = data.aws_subnets.default_public_subnets.ids
+    security_groups  = [aws_security_group.ecs_sg.id]
+    assign_public_ip = true
+  }
+}
+
+# Security Group for ECS
+resource "aws_security_group" "ecs_sg" {
+  name   = "log-api-sg"
+  vpc_id = data.aws_vpc.default.id
+
+  ingress {
+    from_port   = 3000
+    to_port     = 3000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
