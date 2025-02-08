@@ -64,6 +64,14 @@ jobs:
 
       - name: Deploy Infrastructure Using Terraform
         run: |
+          echo "Current Directory:"
+          pwd
+          tree
+          echo "Listing Files:"
+          ls -lah
+          echo "Changing to terraform directory..."
+          cd terraform || exit 1
+          ls -lah
           cd terraform
           terraform init
           terraform apply -auto-approve
