@@ -52,6 +52,14 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+      
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.5  
+
+      - name: Verify Terraform Installation
+        run: terraform --version 
         
       - name: Set Environment Variables
         run: |
@@ -64,13 +72,6 @@ jobs:
 
       - name: Deploy Infrastructure Using Terraform
         run: |
-          echo "Current Directory:"
-          pwd
-          tree
-          echo "Listing Files:"
-          ls -lah
-          echo "Changing to terraform directory..."
           cd terraform 
-          ls -lah
           terraform init
           terraform apply -auto-approve
