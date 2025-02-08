@@ -70,8 +70,7 @@ jobs:
           echo "Listing Files:"
           ls -lah
           echo "Changing to terraform directory..."
-          cd terraform || exit 1
+          cd terraform 
           ls -lah
-          cd terraform
           terraform init
           terraform apply -auto-approve
