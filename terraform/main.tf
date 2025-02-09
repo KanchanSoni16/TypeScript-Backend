@@ -140,7 +140,7 @@ resource "aws_ecs_task_definition" "log_task" {
         }
       ]
       environment = [
-        { name = "DB_HOST", value = aws_db_instance.postgres.endpoint },
+        { name = "DB_HOST", value = aws_db_instance.postgres.address },
         { name = "DB_USER", value = var.db_user },
         { name = "DB_PASS", value = var.db_password },
         { name = "DB_NAME", value = var.db_name },

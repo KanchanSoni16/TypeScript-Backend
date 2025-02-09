@@ -1,3 +1,14 @@
+# Assignment: 
+
+"Create a backend using TypeScript and a PostgreSQL database with one table named “log”.
+The exposed backend API must enable the insertion and listing of data.
+The log table must have:
+an “id” column as the primary key
+an “inserted_at” column of type “timestamptz” with the default value: “now()”
+a “json” column of type “json”
+All columns must have the “NOT NULL” constraint.
+Create a CI/CD pipeline using GitHub actions to run test and deploy the backend using infrastructure as code in any environment.
+
 # Pre Requisites 
 
 ## Things to do before running the project 
@@ -99,8 +110,8 @@ enter DB password
 ````sh
 {
   "compilerOptions": {
-    "target": "ES6",
-    "module": "CommonJS",
+    "target": "es2016",
+    "module": "commonjs",
     "outDir": "./dist",
     "rootDir": "./src",
     "strict": true,
