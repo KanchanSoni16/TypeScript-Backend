@@ -2,33 +2,40 @@
 
 ## Things to do before running the project 
 
-1. Pull the code in local system
+1. Pull the code in local system and create .env and terraform.tfvars file with required value
 
+#### .env file
+````sh
+DB_USER=postgres
+DB_HOST=<RDS instance Endpoint>
+DB_NAME=logs
+DB_PASS=<your_db_password>
+DB_PORT=5432
+PORT=3000
+````
+#### terraform.tvvars file
+````sh
+aws_account_id = "445567088716"
+aws_region     = "us-east-1"
+db_user     = "postgres"
+db_password = <your_db_password>
+db_name     = "logs"
+db_port     = "5432"
+port        = "3000"
+````
 2. Create S3 bucket for manually for terraform statefile storing and replace the bucket name into terraform main.tf file
 
 3. Create ECR registory manually which will store docker images 
 
-## Important Pointers / Pre Requisites 
+## Important Pointers 
 
-values of below variables are mentioned in .env file created in same directory if you want to run the application in local machine
-
-````sh
-DB_USER=postgres
-DB_HOST=your_postgres_endpoint
-DB_NAME=logs
-DB_PASS=db_password
-DB_PORT=5432
-PORT=3000
-````
-
-Values of below variables are created in Github pipeline Secrets to use in pipeline during execution
+Below mentioned Values need to be added into Github pipeline Secrets to use in pipeline during execution
 
 ````sh
 AWS_ACCESS_KEY
 AWS_ACCOUNT_ID
 AWS_REGION
 AWS_SECRET_KEY
-TF_DB_HOST
 TF_DB_NAME
 TF_DB_PASS
 TF_DB_PORT
@@ -65,7 +72,7 @@ TF_PORT
 
 # Test Data in Database:
 ````sh
-psql -h typescript-postgresql.cd406mieqdzb.us-east-1.rds.amazonaws.com -U postgres -d logs -W
+psql -h <RDS_Endpoint> -U postgres -d logs -W
 enter DB password
 ````
 ## To verify DB

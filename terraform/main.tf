@@ -128,7 +128,7 @@ resource "aws_ecs_task_definition" "log_task" {
   container_definitions = jsonencode([
     {
       name      = "log-api"
-      image     = "${var.aws_account_id}.dkr.ecr.${var.aws_region}.amazonaws.com/log-api:latest"
+      image     = "public.ecr.aws/docker/library/nginx:latest" #"${var.aws_account_id}.dkr.ecr.${var.aws_region}.amazonaws.com/log-api:latest"
       cpu       = 256
       memory    = 512
       essential = true
@@ -160,6 +160,7 @@ resource "aws_ecs_task_definition" "log_task" {
       }
     }
   ])
+  depends_on = [ aws_db_instance.postgres ]
 }
 
 # ECS Service

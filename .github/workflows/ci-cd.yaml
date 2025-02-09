@@ -42,7 +42,7 @@ jobs:
       - name: Wait for RDS to be available
         run: |
           echo "Waiting for RDS instance to be available..."
-          sleep 120  # Wait for 2 minutes (adjust based on your RDS creation time)
+          sleep 60  # Wait for 1 minutes for RDS instance to be available completely
 
   build-push-image:
     runs-on: ubuntu-latest
@@ -67,7 +67,7 @@ jobs:
         run: |
           aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY }}
           aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_KEY }}
-          aws configure set region us-east-1
+          aws configure set region ${{ secrets.AWS_REGION }}
 
       - name: Log in to Amazon ECR
         run: |
@@ -89,6 +89,12 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Update ECS Service to Use New Docker Image
+      - name: Register New ECS Task Definition with Correct Image
+        run: |
+          aws ecs describe-task-definition --task-definition log-api-task > task_def.json
+          jq '.taskDefinition.containerDefinitions[0].image = "${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/log-api:latest"' task_def.json > new_task_def.json
+          aws ecs register-task-definition --cli-input-json file://new_task_def.json
+
+      - name: Update ECS Service to Use New Task Definition
         run: |
           aws ecs update-service --cluster log-api-cluster --service log-api-service --force-new-deployment
