@@ -27,6 +27,11 @@ jobs:
           echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_KEY }}" >> $GITHUB_ENV
           echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> $GITHUB_ENV
           echo "TF_VAR_aws_account_id=${{ secrets.AWS_ACCOUNT_ID }}" >> $GITHUB_ENV
+          echo "TF_VAR_db_user=${{ secrets.TF_DB_USER }}" >> $GITHUB_ENV
+          echo "TF_VAR_db_password=${{ secrets.TF_DB_PASS }}" >> $GITHUB_ENV
+          echo "TF_VAR_db_name=${{ secrets.TF_DB_NAME }}" >> $GITHUB_ENV
+          echo "TF_VAR_db_port=${{ secrets.TF_DB_PORT }}" >> $GITHUB_ENV
+          echo "TF_VAR_port=${{ secrets.TF_PORT }}" >> $GITHUB_ENV
 
       - name: Deploy Infrastructure Using Terraform
         run: |
