@@ -97,17 +97,6 @@ jobs:
 
       - name: Register New ECS Task Definition with Correct Image
         run: |
-          aws ecs describe-task-definition --task-definition log-api-task > task_def.json
-          jq '.taskDefinition.containerDefinitions[0].image = "${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/log-api:latest"' task_def.json > new_task_def.json
-          aws ecs register-task-definition --cli-input-json file://new_task_def.json
-
-      - name: Update ECS Service to Use New Task Definition
-        run: |
-          aws ecs update-service --cluster log-api-cluster --service log-api-service --force-new-deployment
-
-
-      - name: Register New ECS Task Definition with Correct Image
-        run: |
           aws ecs describe-task-definition --task-definition log-api-task --region us-east-1 > task_def.json
 
           jq '{
@@ -119,13 +108,11 @@ jobs:
             cpu: .taskDefinition.cpu,
             memory: .taskDefinition.memory
           }' task_def.json > new_task_def.json
-          
+
           aws ecs register-task-definition --cli-input-json file://new_task_def.json --region us-east-1
 
       - name: Update ECS Service to Use New Task Definition
         run: |
-          # Step 4: Get latest task revision
           TASK_REVISION=$(aws ecs describe-task-definition --task-definition log-api-task --query "taskDefinition.revision" --output text --region us-east-1)
 
-          # Step 5: Update ECS service to use the latest revision
           aws ecs update-service --cluster log-api-cluster --service log-api-service --task-definition log-api-task:$TASK_REVISION --force-new-deployment --region us-east-1
