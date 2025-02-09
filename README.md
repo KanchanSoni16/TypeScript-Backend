@@ -87,3 +87,24 @@ enter DB password
 ```
 
 
+# Install Node.js and TypeScript
+1.	Install Node.js (LTS)
+2.	npm install -g typescript
+3.	tsc -v
+4.	mkdir TypeScript-Backend && cd TypeScript-Backend
+5.	tsc  - - init
+6.	npm install express pg dotenv cors helmet morgan
+7.	npm install --save-dev typescript ts-node @types/node @types/express @types/cors @types/morgan nodemon @types/pg
+8.	Config file correction
+````sh
+{
+  "compilerOptions": {
+    "target": "ES6",
+    "module": "CommonJS",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true
+  }
+}
+````
