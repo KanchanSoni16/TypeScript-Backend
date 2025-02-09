@@ -9,6 +9,14 @@ a “json” column of type “json”
 All columns must have the “NOT NULL” constraint.
 Create a CI/CD pipeline using GitHub actions to run test and deploy the backend using infrastructure as code in any environment.
 
+
+#  Tools/Environment
+````sh
+1. Backedn Language : Typescript
+2. CI CD Pipeline: Github Action 
+3. CLoud : AWS Cloud
+4. IaC: Terraform
+````
 # Pre Requisites 
 
 ## Things to do before running the project 
@@ -24,7 +32,7 @@ DB_PASS=<your_db_password>
 DB_PORT=5432
 PORT=3000
 ````
-#### terraform.tvvars file
+#### terraform.tfvars file
 ````sh
 aws_account_id = "445567088716"
 aws_region     = "us-east-1"
@@ -104,7 +112,7 @@ enter DB password
 3.	tsc -v
 4.	mkdir TypeScript-Backend && cd TypeScript-Backend
 5.	tsc  - - init
-6.	npm install express pg dotenv cors helmet morgan
+6.	npm install express pg dotenv
 7.	npm install --save-dev typescript ts-node @types/node @types/express @types/cors @types/morgan nodemon @types/pg
 8.	Config file correction
 ````sh
