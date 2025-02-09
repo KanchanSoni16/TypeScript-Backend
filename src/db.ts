@@ -12,4 +12,24 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false } 
 });
 
+const createLogTable = async () => {
+  const createTableQuery = `
+    CREATE TABLE IF NOT EXISTS log (
+      id SERIAL PRIMARY KEY,
+      inserted_at TIMESTAMPTZ DEFAULT now() NOT NULL,
+      json JSON NOT NULL
+    );
+  `;
+
+  try {
+    await pool.query(createTableQuery);
+    console.log("'log' table is ready.");
+  } catch (error) {
+    console.error("Error creating 'log' table:", error);
+  }
+};
+
+// Execute the table creation function on startup
+createLogTable();
+
 export default pool;

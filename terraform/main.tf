@@ -20,6 +20,48 @@ data "aws_subnets" "default_public_subnets" {
   }
 }
 
+# RDS Security Group
+resource "aws_security_group" "rds_sg" {
+  name        = "rds-security-group"
+  description = "Allow database access"
+  vpc_id      = data.aws_vpc.default.id
+
+  ingress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]  
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# PostgreSQL RDS Instance
+resource "aws_db_instance" "postgres" {
+  allocated_storage    = 20
+  storage_type         = "gp2"
+  engine              = "postgres"
+  engine_version      = "14.3"
+  instance_class      = "db.t3.micro"
+  identifier          = "log-api-db"
+  username           = var.db_user
+  password           = var.db_password
+  db_name            = var.db_name
+  publicly_accessible = true  
+  vpc_security_group_ids = [aws_security_group.rds_sg.id]
+  multi_az            = false
+  skip_final_snapshot = true
+}
+
+# Output the RDS Endpoint
+output "rds_endpoint" {
+  value = aws_db_instance.postgres.endpoint
+}
 
 resource "aws_iam_role" "ecs_execution_role" {
   name = "ecsTaskExecutionRole"
@@ -98,7 +140,7 @@ resource "aws_ecs_task_definition" "log_task" {
         }
       ]
       environment = [
-        { name = "DB_HOST", value = var.db_host },
+        { name = "DB_HOST", value = aws_db_instance.postgres.endpoint },
         { name = "DB_USER", value = var.db_user },
         { name = "DB_PASS", value = var.db_password },
         { name = "DB_NAME", value = var.db_name },

@@ -4,11 +4,9 @@
 
 1. Pull the code in local system
 
-2. Create RDS instance with postgres DB manually 
+2. Create S3 bucket for manually for terraform statefile storing and replace the bucket name into terraform main.tf file
 
-3. Create S3 bucket for manually for terraform statefile storing and replace the bucket name into terraform main.tf file
-
-4. Create ECR registory manually which will store docker images 
+3. Create ECR registory manually which will store docker images 
 
 ## Important Pointers / Pre Requisites 
 
@@ -37,20 +35,6 @@ TF_DB_PORT
 TF_DB_USER
 TF_PORT
 ````
-
-# Create Database "logs" and Table "log" in RDS Postgres Database
-
-```sh
-    CREATE DATABASE logs;
-    
-    \l 
-
-    CREATE TABLE log ( id SERIAL PRIMARY KEY, inserted_at TIMESTAMPTZ DEFAULT now() NOT NULL, json JSON NOT NULL);
-
-    ELECT * FROM log;
-````
-
-
 # Run the application manually
     npx ts-node src/server.ts
 
@@ -80,23 +64,18 @@ TF_PORT
 
 
 # Test Data in Database:
-
+````sh
 psql -h typescript-postgresql.cd406mieqdzb.us-east-1.rds.amazonaws.com -U postgres -d logs -W
 enter DB password
-
+````
 ## To verify DB
 
 ```sh
 1. list all the DB:  
-    
      \l 
-
 2. select logs DB:
-
-
     \c logs
 3. Select all the rows:
-
     SELECT * FROM log;
 ```
 

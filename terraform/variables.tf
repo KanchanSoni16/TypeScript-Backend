@@ -11,13 +11,7 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 
-
 # Database Variables
-variable "db_host" {
-  description = "RDS PostgreSQL endpoint"
-  type        = string
-}
-
 variable "db_user" {
   description = "Database username"
   type        = string
